@@ -11,4 +11,4 @@ COPY src ./src
 RUN npm run build
 
 FROM nginx:mainline-alpine as production
-COPY --from=build /build/dist/* /var/www/html
+COPY --from=build /build/dist/* /usr/share/nginx/html/

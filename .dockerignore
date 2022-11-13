@@ -1,4 +1,5 @@
-.idea/
-dist/
+.idea
+.github
+dist
 node_modules
 Dockerfile
