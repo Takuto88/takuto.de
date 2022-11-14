@@ -1,16 +1,208 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap w/ Webpack</title>
-    <link rel="stylesheet" href="./main.css">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>Resume - Start Bootstrap Theme</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico"/>
 </head>
-<body>
-<div class="container py-4 px-3 mx-auto">
-    <h1>Hello, Bootstrap and Webpack!</h1>
-    <button class="btn btn-primary">Primary button</button>
+<body id="page-top">
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+    <a class="navbar-brand js-scroll-trigger" href="#page-top">
+        <span class="d-block d-lg-none">Lennart Rosam</span>
+        <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                                             src="img/profile.jpg" alt="..."/></span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+            class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#about">About</a></li>
+            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#experience">Experience</a></li>
+            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#technologies">Technologies</a></li>
+            <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#pgp">PGP Key & Email</a></li>
+        </ul>
+    </div>
+</nav>
+<!-- Page Content-->
+<div class="container-fluid p-0">
+    <!-- About-->
+    <section class="resume-section" id="about">
+        <div class="resume-section-content">
+            <h1 class="mb-0">
+                Lennart
+                <span class="text-primary">Rosam</span>
+            </h1>
+            <div class="subheading mb-3">
+                Software Engineer · Based in Oldenburg, Lower Saxony, Germany
+            </div>
+            <p class="mb-2">
+                TL; DR:
+            </p>
+            <ul class="mb-2">
+                <li>👷 Backend over frontend</li>
+                <li>☕️ Java over JavaScript</li>
+                <li>📺 Terminal over GUI</li>
+                <li>🛠️ DevOps / GitOps mentality</li>
+                <li>🔒 Web-Security aware</li>
+                <li>🐳 Dockerize all the things</li>
+                <li>⛴️ Ship stuff through k8s, cloud run & co.</li>
+                <li>☎️ Acquired interest for telephony (SIP/RTP) and 2G/3G/4G mobile Networks (SS7, DIAMETER)</li>
+            </ul>
+
+            <p class="mb-3">
+                This site is static HTML, dockerized and deployed to GCP via GitHub actions.
+                <a href="https://github.com/Takuto88/takuto.de">Sources are available on GitHub.</a>
+            </p>
+
+            <div class="social-icons">
+                <a class="social-icon" href="https://www.xing.com/profile/Lennart_Rosam"><i class="fab fa-xing"></i></a>
+                <a class="social-icon" href="https://github.com/Takuto88"><i class="fab fa-github"></i></a>
+                <a rel="me" class="social-icon" href="https://norden.social/@Takuto"><i class="fab fa-mastodon"></i></a>
+                <a class="social-icon" href="https://twitter.com/Takuto88"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </section>
+    <hr class="m-0"/>
+    <!-- Experience-->
+    <section class="resume-section" id="experience">
+        <div class="resume-section-content">
+            <h2 class="mb-5">Experience</h2>
+            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                <div class="flex-grow-1">
+                    <h3 class="mb-0">Software Engineer (Remote)</h3>
+                    <div class="subheading mb-3">sipgate GmbH</div>
+                    <p>
+                        sipgate is a telephone company and Full-MVNO (Mobile Virtual Network Operator) based in
+                        Düsseldorf, Germany. As a member of one of the core telephony network team, I work on software
+                        components related to SIP telephony gateways and the 2G/3G/4G network core. Those are
+                        (micro) services that are mainly written in Java 8 - 17 and involves lower level handling of
+                        many "non-web" protocols like DIAMETER, SS7 and SIP.
+                    </p>
+                </div>
+                <div class="flex-shrink-0"><span class="text-primary">April 2021 - Present</span></div>
+            </div>
+            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                <div class="flex-grow-1">
+                    <h3 class="mb-0">Backend Engineer (Remote)</h3>
+                    <div class="subheading mb-3">MDM Münzhandelsgesellschaft mbH</div>
+                    <p>
+                        MDM is an online retailer for collectors items, primarily coins and valuable metals like gold
+                        bars. As a lead engineer of the middleware team, I was responsible for developing microservices
+                        for things like credit scoring and handling of payments. Those were RESTFUL services that needed
+                        to integrate into MDMs existing SAP / ABAP based legacy core. It was my job to work with the SAP
+                        devs to engineer business requirements and identify problems.
+                    </p>
+                    <p>
+                        I also helped to facilitate deployments of software to Google Cloud Platform in Kubernetes via
+                        HELM. The software stack was primarily PHP 7.3, Symfony and MySQL (CloudSQL).
+                    </p>
+                </div>
+                <div class="flex-shrink-0"><span class="text-primary">June 2020 - March 2021</span></div>
+            </div>
+            <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                <div class="flex-grow-1">
+                    <h3 class="mb-0">Software Engineer</h3>
+                    <div class="subheading mb-3">Traum-Ferienwohnungen GmbH</div>
+                    <p>
+                        Traum is an online marketplace for renting vacation homes all over europe. I was primarily in
+                        charge of maintaining the legacy monolithic core written in PHP 5. This involved "cutting back"
+                        the monolith on the path to a microservice based architecture and also updating the old core
+                        to newer versions of PHP (7.0), containerizing it, and making it cloud ready to be able to run
+                        it in Kubernetes.
+                    </p>
+                </div>
+                <div class="flex-shrink-0"><span class="text-primary">May 2016 - May 2020</span></div>
+            </div>
+            <div class="d-flex flex-column flex-md-row justify-content-between">
+                <div class="flex-grow-1">
+                    <h3 class="mb-0">Unix System Administrator / Later: Backend Developer</h3>
+                    <div class="subheading mb-3">MSP - Medien Systempartner GmbH</div>
+                    <p>
+                        MSP is an agency delivering SAAS for customers in the newspaper publishing business. I started
+                        out as an system administrator for unix systems where I maintained various servers based on
+                        SUN Solaris and Ubuntu Server.
+                    </p>
+                    <p>
+                        I found my passion for software development here and later switched to the dev team as a
+                        backend engineer. I worked on developing the JavaEE 8 backend for an iPad app, bringing the
+                        Bremen based WESER-KURIER newspaper onto the first iPad back when it was still a relatively new
+                        thing.
+                    </p>
+
+                    <p>
+                        Based on the same technology, I also re-engineered the Browser E-Paper API for the
+                        Nordwest-Zeitung newspaper here in Oldenburg.
+                    </p>
+                </div>
+                <div class="flex-shrink-0"><span class="text-primary">September 2010 - April 2016</span></div>
+            </div>
+        </div>
+    </section>
+    <hr class="m-0"/>
+    <!-- Technologies-->
+    <section class="resume-section" id="technologies">
+        <div class="resume-section-content">
+            <h2 class="mb-5">Technologies</h2>
+            <div class="subheading mb-3">Programming Languages & Tools</div>
+            <ul class="list-inline dev-icons">
+                <li class="list-inline-item"><i class="fab fa-java"></i></li>
+                <li class="list-inline-item"><i class="fab fa-php"></i></li>
+                <li class="list-inline-item"><i class="fab fa-laravel"></i></li>
+                <li class="list-inline-item"><i class="fab fa-symfony"></i></li>
+                <li class="list-inline-item"><i class="fab fa-html5"></i></li>
+                <li class="list-inline-item"><i class="fab fa-css3"></i></li>
+                <li class="list-inline-item"><i class="fab fa-npm"></i></li>
+                <li class="list-inline-item"><i class="fab fa-linux"></i></li>
+                <li class="list-inline-item"><i class="fab fa-docker"></i></li>
+                <li class="list-inline-item"><i class="fab fa-git"></i></li>
+                <li class="list-inline-item"><i class="fab fa-jenkins"></i></li>
+                <li class="list-inline-item"><i class="fab fa-github"></i></li>
+                <li class="list-inline-item"><i class="fab fa-gitlab"></i></li>
+
+            </ul>
+            <div class="subheading mb-3">Workflow</div>
+            <ul class="fa-ul mb-0">
+                <li>
+                    <span class="fa-li"><i class="fas fa-check"></i></span>
+                    Cross Functional Teams
+                </li>
+                <li>
+                    <span class="fa-li"><i class="fas fa-check"></i></span>
+                    Agile Development & Scrum
+                </li>
+                <li>
+                    <span class="fa-li"><i class="fas fa-check"></i></span>
+                    Test Driven Development
+                </li>
+                <li>
+                    <span class="fa-li"><i class="fas fa-check"></i></span>
+                    Prefers self-organized environments #new-work
+                </li>
+            </ul>
+        </div>
+    </section>
+    <hr class="m-0"/>
+    <!-- Contact-->
+    <section class="resume-section" id="pgp">
+        <div class="resume-section-content">
+            <h2 class="mb-5">PGP Key & Email</h2>
+            <ul class="fa-ul mb-0">
+                <li>
+                    <span class="fa-li"><i class="fas fa-arrow-right"></i></span>
+                    Mail: <a href="mailto:hello@takuto.de">hello@takuto.de</a>
+                </li>
+                <li>
+                    <span class="fa-li"><i class="fas fa-arrow-right"></i></span>
+                    PGP-Key fingerprint: <a href="https://keys.openpgp.org/vks/v1/by-fingerprint/7B5A1DDC235700E40BF185CDF103A165F9BBE96C">7B5A1DDC235700E40BF185CDF103A165F9BBE96C</a>
+                </li>
+            </ul>
+        </div>
+    </section>
 </div>
-<script src="./main.js"></script>
 </body>
 </html>

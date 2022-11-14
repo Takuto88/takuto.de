@@ -20,8 +20,22 @@ module.exports = {
             template: 'src/index.html'
         })
     ],
+    resolve: {
+        extensions: ['*', '.js']
+    },
+    devtool: 'source-map',
     module: {
         rules: [
+            {
+                test: /\.(js)$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env']
+                    }
+                }
+            },
             {
                 test: /\.(scss)$/,
                 use: [
@@ -45,7 +59,18 @@ module.exports = {
                         loader: 'sass-loader'
                     }
                 ]
-            }
+            },
+            {
+
+                test: /\.(png|svg|jpg|jpeg|gif|ico)$/i,
+                type: "asset/resource"
+            },
+            {
+                test:/\.html$/,
+                use: [
+                    'html-loader'
+                ]
+            },
         ]
     }
 }
