@@ -37,7 +37,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
       - id: 'deploy'
-        uses: 'google-github-actions/deploy-cloudrun@v0'
+        uses: 'google-github-actions/deploy-cloudrun@v1'
         with:
           service: 'website'
           image: 'europe-west1-docker.pkg.dev/takuto-de-site/takuto/website:${{ github.sha }}'
