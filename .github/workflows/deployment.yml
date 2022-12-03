@@ -10,7 +10,7 @@ jobs:
       - id: 'checkout'
         uses: actions/checkout@v3
       - id: 'auth'
-        uses: 'google-github-actions/auth@v0'
+        uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
       - id: 'build-and-push'
@@ -33,7 +33,7 @@ jobs:
       id-token: 'write'
     steps:
       - id: 'auth'
-        uses: 'google-github-actions/auth@v0'
+        uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
       - id: 'deploy'
