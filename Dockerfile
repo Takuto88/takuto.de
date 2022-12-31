@@ -16,7 +16,7 @@ COPY --from=build /build/dist/* /usr/share/nginx/html/
 FROM build as development
 RUN npm install && \
     echo "#!/usr/bin/env sh" > /start-dev.sh && \
-    echo "npm install && npm run start" > /start-dev.sh && \
+    echo "npm install && npm run start-docker" > /start-dev.sh && \
     chmod a+x /start-dev.sh
 
 CMD ["/start-dev.sh"]

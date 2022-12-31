@@ -1,3 +1,4 @@
-docker build --target production -t takuto-de:production .
+#!/usr/bin/env sh
 
-docker run --rm -ti --name takuto-de-production -p 8080:80 takuto-de:production
+docker compose -f docker-compose.yml build
+docker compose -f docker-compose.yml up

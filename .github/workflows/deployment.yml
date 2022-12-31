@@ -1,5 +1,8 @@
-name: Push to GCR GitHub Action
-on: [push]
+name: Deploy to Google Cloud Run
+on:
+  push:
+    branches:
+      - main
 jobs:
   build-and-push-to-gcr:
     runs-on: ubuntu-22.04
