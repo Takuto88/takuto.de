@@ -7,7 +7,7 @@ jobs:
  cypress-visual-regression:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: docker compose -f docker-compose.yml build
       - run: docker compose -f docker-compose.yml up -d
       - run: ./run-e2e.sh
