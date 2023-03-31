@@ -12,7 +12,7 @@
   "author": "Lennart Rosam",
   "license": "unlicense",
   "devDependencies": {
-    "@babel/core": "^7.20.7",
+    "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.20.2",
     "autoprefixer": "^10.4.13",
     "babel-loader": "^9.1.0",
