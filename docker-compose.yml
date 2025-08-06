@@ -1,6 +1,6 @@
 services:
   web:
     build: .
-    image: ghcr.io/takuto/takuto-de:latest
+    image: ghcr.io/takuto88/takuto-de:latest
     ports:
       - "80:80"
