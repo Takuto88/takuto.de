@@ -4,40 +4,24 @@ This repository contains the source code of my home page. It is used for updatin
 
 Released under [MIT](LICENSE).
 
-## Local dev setup (docker)
+## Local development (Docker Compose)
 
-No need to have npm / nodejs installed locally, but you have to have a somewhat recent version of docker installed. 
+ You need a recent version of Docker and Docker Compose installed.
 
-Then simply run this:
-```shell
-./run-dev.sh
-```
+To start the development environment:
 
-Then goto [https://localhost:8080](https://localhost:8080).
+1. Run Docker Compose:
+   ```shell
+   docker compose up
+   ```
+2. Open [http://localhost:8080](http://localhost:8080) in your browser.
 
-## Local dev setup (npm)
+## Production build & run (Docker Compose)
 
-This requires node 18 and npm 8 or greater to be installed locally. Earlier versions might work too, but are not tested.
+To build and run the production image locally:
 
-```
-npm install -y && npm start
-```
-
-Then goto [https://localhost:8080](https://localhost:8080).
-
-## Build & run production image locally
-
-The site is deployed through docker in a simple NGINX container. To build and run it, you'll need to have docker
-installed in a somewhat recent version. Then run:
-
-````shell
-./run-production.sh
-````
-
-Then goto [https://localhost:8080](https://localhost:8080).
-
-## Attributions
-
-I'm no frontend guy so the template was picked from [startbootstrap](https://github.com/startbootstrap/startbootstrap-resume).
-Things I've done myself are the npm / webpack / docker / GCP deploy chain and the texts of course, but the eye candy
-was not developed here 😉.
+1. Build and start the container:
+   ```shell
+   docker compose -f docker-compose.yml up --build
+   ```
+2. Open [http://localhost](http://localhost) in your browser.
