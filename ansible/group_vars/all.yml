@@ -1,6 +1,8 @@
 ---
 # Hetzner Cloud configuration
-hcloud_token: "YOUR_HETZNER_API_TOKEN_HERE"
+# Set via environment variable:
+# export HCLOUD_TOKEN='your-hetzner-cloud-api-token'
+hcloud_token: "{{ lookup('env', 'HCLOUD_TOKEN') | default('') }}"
 
 # VM configuration
 server_name: "takuto-web"
@@ -9,11 +11,29 @@ server_image: "debian-12"
 server_location: "fsn1"  # Falkenstein
 
 # SSH configuration
-ssh_key_name: "lennart@Lennarts-MacBook.local"
-ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDYCVfP7GbNeRv6zjDgjeeh7Xdswh7yyqx6nXHRNSrEEpScVoS5JonWF18Uy+m/7dsUz9rRDwiuO+FyQpmWbsZFXndhbYg77EP3+wGEt7xzNz1uhW/lbio10edxmO5eIfJLvRteJEdAzL/W2BrZx4dEdRxooAC/mnpWFLM54iE7zDXmETlpUJeDvzXo+aJU0wye+BHmyIzkkyqGqRD7RgidenG0WogL9qmNgPq0LN9Q39bP69ETEtB9oJPrkNo+wAn/IcQ8FbzPbM9gzaYv7d9+HinbSBLJuhAfzjBmWwVgcwW+DGyODvgLx4ZJ8aZrPjLf2GrAlehr0tDFw7rGzQfj lennart@Lennarts-MacBook.local"
+# Set these values via environment variables:
+# export SSH_KEY_NAME='your-key-name'
+# export SSH_PUBLIC_KEY='ssh-rsa AAAA...'
+ssh_key_name: "{{ lookup('env', 'SSH_KEY_NAME') | default('') }}"
+ssh_public_key: "{{ lookup('env', 'SSH_PUBLIC_KEY') | default('') }}"
 
 # Network configuration
 ensure_ipv4: true
 
 # Deployment configuration
-website_version: "latest"  # Default version tag for the Docker image
+# Set via environment variable:
+# export WEBSITE_VERSION='v1.0.0'
+website_version: "{{ lookup('env', 'WEBSITE_VERSION') | default('latest') }}"  # Default version tag for the Docker image
+
+# Nginx reverse proxy configuration
+domains:
+  - "takuto.de"
+  - "www.takuto.de"
+email_for_certbot: "hello@takuto.de"  # Email address for Let's Encrypt notifications
+
+# Google Cloud DNS configuration for Let's Encrypt DNS challenge
+# Set these values via environment variables:
+# export GCLOUD_DNS_SA='{"type":"service_account",...}'
+# export GCLOUD_DNS_ZONE='your-zone-name'
+gcloud_dns_service_account: "{{ lookup('env', 'GCLOUD_DNS_SA') | default('') }}"
+gcloud_dns_zone: "{{ lookup('env', 'GCLOUD_DNS_ZONE') | default('takuto-de') }}"

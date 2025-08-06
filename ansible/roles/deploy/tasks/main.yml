@@ -1,5 +1,29 @@
 ---
-- name: Pull Docker image
+- name: Create application directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/nginx-proxy
+    - /opt/nginx-proxy/conf.d
+    - /opt/nginx-proxy/vhost.d
+    - /opt/nginx-proxy/html
+    - /opt/nginx-proxy/certs
+    - /opt/nginx-proxy/gcloud-dns
+
+- name: Create Google Cloud DNS service account key file
+  copy:
+    content: "{{ gcloud_dns_service_account }}"
+    dest: /opt/nginx-proxy/gcloud-dns/credentials.json
+    mode: '0600'
+
+- name: Create Docker network for nginx-proxy
+  community.docker.docker_network:
+    name: nginx-proxy
+    driver: bridge
+
+- name: Pull Docker image for the website
   community.docker.docker_image:
     name: "ghcr.io/takuto88/takuto-de:{{ website_version }}"
     source: pull
@@ -12,7 +36,56 @@
     image: "ghcr.io/takuto88/takuto-de:{{ website_version }}"
     state: started
     restart_policy: always
+    networks:
+      - name: nginx-proxy
+    env:
+      VIRTUAL_HOST: "{{ domains | join(',') }}"
+      VIRTUAL_PORT: "80"
+      LETSENCRYPT_HOST: "{{ domains | join(',') }}"
+    restart: yes
+
+- name: Deploy nginx-proxy container
+  community.docker.docker_container:
+    name: nginx-proxy
+    image: nginxproxy/nginx-proxy:latest
+    state: started
+    restart_policy: always
+    networks:
+      - name: nginx-proxy
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - /opt/nginx-proxy/conf.d:/etc/nginx/conf.d
+      - /opt/nginx-proxy/vhost.d:/etc/nginx/vhost.d
+      - /opt/nginx-proxy/html:/usr/share/nginx/html
+      - /opt/nginx-proxy/certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    restart: yes
+
+- name: Deploy letsencrypt-companion container
+  community.docker.docker_container:
+    name: letsencrypt-companion
+    image: nginxproxy/acme-companion:latest
+    state: started
+    restart_policy: always
+    networks:
+      - name: nginx-proxy
+    volumes:
+      - /opt/nginx-proxy/certs:/etc/nginx/certs
+      - /opt/nginx-proxy/vhost.d:/etc/nginx/vhost.d
+      - /opt/nginx-proxy/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/nginx-proxy/gcloud-dns:/gcloud-dns
+    volumes_from:
+      - nginx-proxy
+    env:
+      DEFAULT_EMAIL: "{{ email_for_certbot }}"
+      ACME_CA_URI: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      NGINX_PROXY_CONTAINER: nginx-proxy
+      ACME_CHALLENGE_TYPE: "dns-01"
+      ACME_DNS_API: "gcloud"
+      GCE_PROJECT: "{{ gcloud_dns_service_account | from_json | json_query('project_id') }}"
+      GCE_SERVICE_ACCOUNT_FILE: "/gcloud-dns/credentials.json"
+      GCE_ZONE_NAME: "{{ gcloud_dns_zone }}"
     restart: yes
