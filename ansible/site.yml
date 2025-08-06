@@ -1,0 +1,14 @@
+---
+- name: Provision Hetzner VM
+  hosts: localhost
+  gather_facts: no
+  roles:
+    - hetzner
+
+- name: Configure server and deploy website
+  hosts: web
+  gather_facts: yes
+  become: yes
+  roles:
+    - docker
+    - deploy

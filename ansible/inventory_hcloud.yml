@@ -1,0 +1,6 @@
+plugin: hetzner.hcloud.hcloud
+token: "{{ hcloud_token }}"
+config_file: inventory_hcloud.config.json
+vars_files:
+  - group_vars/all.yml
+

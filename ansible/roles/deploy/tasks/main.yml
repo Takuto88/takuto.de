@@ -1,0 +1,18 @@
+---
+- name: Pull Docker image
+  community.docker.docker_image:
+    name: "ghcr.io/takuto88/takuto-de:{{ website_version }}"
+    source: pull
+    force_source: yes
+    state: present
+
+- name: Run website container
+  community.docker.docker_container:
+    name: takuto-website
+    image: "ghcr.io/takuto88/takuto-de:{{ website_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: yes

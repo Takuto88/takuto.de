@@ -1,0 +1,46 @@
+---
+- name: Ensure hcloud Python package is installed
+  pip:
+    name: hcloud
+    state: present
+  delegate_to: localhost
+
+- name: Add SSH key to Hetzner Cloud
+  hcloud_ssh_key:
+    api_token: "{{ hcloud_token }}"
+    name: "{{ ssh_key_name }}"
+    public_key: "{{ ssh_public_key }}"
+    state: present
+  register: hcloud_ssh_key
+  delegate_to: localhost
+
+- name: Create Hetzner Cloud server
+  hcloud_server:
+    api_token: "{{ hcloud_token }}"
+    name: "{{ server_name }}"
+    server_type: "{{ server_type }}"
+    image: "{{ server_image }}"
+    location: "{{ server_location }}"
+    ssh_keys:
+      - "{{ ssh_key_name }}"
+    state: present
+  register: hcloud_server
+  delegate_to: localhost
+
+- name: Wait for SSH to come up
+  wait_for:
+    host: "{{ hcloud_server.hcloud_server.ipv4_address }}"
+    port: 22
+    delay: 10
+    timeout: 300
+  delegate_to: localhost
+  when: hcloud_server.changed
+
+- name: Add host to dynamic inventory
+  add_host:
+    name: "{{ server_name }}"
+    groups: web
+    ansible_host: "{{ hcloud_server.hcloud_server.ipv4_address }}"
+    ansible_user: root
+    hcloud_server_name: "{{ server_name }}"
+  delegate_to: localhost

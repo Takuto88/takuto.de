@@ -1,0 +1,19 @@
+---
+# Hetzner Cloud configuration
+hcloud_token: "YOUR_HETZNER_API_TOKEN_HERE"
+
+# VM configuration
+server_name: "takuto-web"
+server_type: "cax11"  # Small arm instance (2 vCPUs, 4GB RAM)
+server_image: "debian-12"
+server_location: "fsn1"  # Falkenstein
+
+# SSH configuration
+ssh_key_name: "lennart@Lennarts-MacBook.local"
+ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDYCVfP7GbNeRv6zjDgjeeh7Xdswh7yyqx6nXHRNSrEEpScVoS5JonWF18Uy+m/7dsUz9rRDwiuO+FyQpmWbsZFXndhbYg77EP3+wGEt7xzNz1uhW/lbio10edxmO5eIfJLvRteJEdAzL/W2BrZx4dEdRxooAC/mnpWFLM54iE7zDXmETlpUJeDvzXo+aJU0wye+BHmyIzkkyqGqRD7RgidenG0WogL9qmNgPq0LN9Q39bP69ETEtB9oJPrkNo+wAn/IcQ8FbzPbM9gzaYv7d9+HinbSBLJuhAfzjBmWwVgcwW+DGyODvgLx4ZJ8aZrPjLf2GrAlehr0tDFw7rGzQfj lennart@Lennarts-MacBook.local"
+
+# Network configuration
+ensure_ipv4: true
+
+# Deployment configuration
+website_version: "latest"  # Default version tag for the Docker image

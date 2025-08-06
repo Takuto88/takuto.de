@@ -1,0 +1,21 @@
+{
+    "plugin": "hetzner.hcloud.hcloud",
+    "strict": false,
+    "compose": {
+        "ansible_host": "ipv4_address"
+    },
+    "groups": {
+        "web": ["takuto-web"]
+    },
+    "keyed_groups": [
+        {
+            "key": "server_type",
+            "prefix": "server_type"
+        },
+        {
+            "key": "datacenter",
+            "prefix": "dc"
+        }
+    ]
+}
+
