@@ -9,13 +9,6 @@ updates:
     assignees:
       - "Takuto88"
 
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    assignees:
-      - "Takuto88"
-
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
