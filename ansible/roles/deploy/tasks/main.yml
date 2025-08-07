@@ -36,6 +36,7 @@
     image: "ghcr.io/takuto88/takuto-de:{{ website_version }}"
     state: started
     restart_policy: always
+    image_name_mismatch: "recreate"
     networks:
       - name: nginx-proxy
     env:
