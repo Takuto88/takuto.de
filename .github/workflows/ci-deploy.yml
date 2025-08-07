@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       website_version:
-        description: 'Docker image tag to deploy (if not "latest", triggers build and push job)'
+        description: 'Docker image tag to deploy (if "latest", triggers build and push job)'
         required: false
         default: 'latest'
 
