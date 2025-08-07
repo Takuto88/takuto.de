@@ -82,7 +82,7 @@
       - nginx-proxy
     env:
       DEFAULT_EMAIL: "{{ email_for_certbot }}"
-      ACME_CA_URI: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      ACME_CA_URI: "https://acme-v02.api.letsencrypt.org/directory"
       NGINX_PROXY_CONTAINER: nginx-proxy
       ACME_CHALLENGE_TYPE: "dns-01"
       ACME_DNS_API: "gcloud"
