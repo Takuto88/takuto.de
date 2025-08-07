@@ -85,7 +85,7 @@
       NGINX_PROXY_CONTAINER: nginx-proxy
       ACME_CHALLENGE_TYPE: "dns-01"
       ACME_DNS_API: "gcloud"
-      GCE_PROJECT: "{{ gcloud_dns_service_account | from_json | json_query('project_id') }}"
+      GCE_PROJECT: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
       GCE_SERVICE_ACCOUNT_FILE: "/gcloud-dns/credentials.json"
       GCE_ZONE_NAME: "{{ gcloud_dns_zone }}"
     restart: yes

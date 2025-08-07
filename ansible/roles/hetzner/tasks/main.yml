@@ -5,13 +5,22 @@
     state: present
   delegate_to: localhost
 
-- name: Add SSH key to Hetzner Cloud
+- name: Add CI SSH key to Hetzner Cloud
   hcloud_ssh_key:
     api_token: "{{ hcloud_token }}"
-    name: "{{ ssh_key_name }}"
-    public_key: "{{ ssh_public_key }}"
+    name: "{{ ci_ssh_key_name }}"
+    public_key: "{{ ci_ssh_public_key }}"
     state: present
-  register: hcloud_ssh_key
+  register: hcloud_ci_ssh_key
+  delegate_to: localhost
+
+- name: Add admin SSH key to Hetzner Cloud
+  hcloud_ssh_key:
+    api_token: "{{ hcloud_token }}"
+    name: "{{ admin_ssh_key_name }}"
+    public_key: "{{ admin_ssh_public_key }}"
+    state: present
+  register: hcloud_admin_ssh_key
   delegate_to: localhost
 
 - name: Create Hetzner Cloud server
@@ -22,7 +31,8 @@
     image: "{{ server_image }}"
     location: "{{ server_location }}"
     ssh_keys:
-      - "{{ ssh_key_name }}"
+      - "{{ ci_ssh_key_name }}"
+      - "{{ admin_ssh_key_name }}"
     state: present
   register: hcloud_server
   delegate_to: localhost
@@ -43,4 +53,97 @@
     ansible_host: "{{ hcloud_server.hcloud_server.ipv4_address }}"
     ansible_user: root
     hcloud_server_name: "{{ server_name }}"
+  delegate_to: localhost
+
+- name: Create temporary directory for GCP credentials
+  tempfile:
+    state: directory
+    prefix: gcp_creds_
+  register: gcp_creds_dir
+  delegate_to: localhost
+
+- name: Write GCP service account credentials to file
+  copy:
+    content: "{{ gcloud_dns_service_account }}"
+    dest: "{{ gcp_creds_dir.path }}/credentials.json"
+    mode: '0600'
+  delegate_to: localhost
+
+- name: Get server IPv6 address
+  hcloud_server_info:
+    api_token: "{{ hcloud_token }}"
+    name: "{{ server_name }}"
+  register: server_info
+  delegate_to: localhost
+
+- name: Get Google Cloud DNS managed zone
+  google.cloud.gcp_dns_managed_zone:
+    name: "{{ gcloud_dns_zone }}"
+    dns_name: "takuto.de."
+    description: "Managed zone for takuto.de"
+    project: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
+    auth_kind: "serviceaccount"
+    service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
+    state: present
+  register: managed_zone
+  delegate_to: localhost
+
+- name: Update DNS A record for domain in Google Cloud DNS
+  google.cloud.gcp_dns_resource_record_set:
+    name: "takuto.de."
+    type: 'A'
+    ttl: 300
+    target:
+      - "{{ hcloud_server.hcloud_server.ipv4_address }}"
+    managed_zone: "{{ managed_zone }}"
+    project: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
+    auth_kind: "serviceaccount"
+    service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
+    state: present
+  delegate_to: localhost
+
+- name: Update DNS AAAA record for domain in Google Cloud DNS
+  google.cloud.gcp_dns_resource_record_set:
+    name: "takuto.de."
+    type: 'AAAA'
+    ttl: 300
+    target:
+      - "{{ server_info.hcloud_server_info[0].ipv6 | regex_replace('/64$', '1') }}"
+    managed_zone: "{{ managed_zone }}"
+    project: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
+    auth_kind: "serviceaccount"
+    service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
+    state: present
+  delegate_to: localhost
+  when: server_info.hcloud_server_info[0].ipv6 is defined
+
+- name: Remove temporary GCP credentials
+  file:
+    path: "{{ gcp_creds_dir.path }}"
+    state: absent
+  delegate_to: localhost
+
+- name: Wait for DNS A record propagation (using Google DNS 8.8.8.8)
+  shell: >
+    dig @8.8.8.8 takuto.de. A +short +tries=1
+  register: dns_check
+  until: dns_check.stdout | trim == hcloud_server.hcloud_server.ipv4_address
+  retries: 60
+  delay: 5
+  delegate_to: localhost
+  no_log: false
+  failed_when: false
+
+- name: Display current DNS value
+  debug:
+    msg: |
+      Expected IP: {{ hcloud_server.hcloud_server.ipv4_address }}
+      Current DNS resolution: {{ dns_check.stdout | trim | default('no response') }}
+  when: dns_check.stdout | trim != hcloud_server.hcloud_server.ipv4_address
+  delegate_to: localhost
+
+- name: Check if DNS propagation completed in time
+  fail:
+    msg: "DNS A record propagation did not complete within the timeout period (5 minutes). Expected {{ hcloud_server.hcloud_server.ipv4_address }} but got {{ dns_check.stdout | trim | default('no response') }}."
+  when: dns_check.stdout | trim != hcloud_server.hcloud_server.ipv4_address
   delegate_to: localhost

@@ -10,12 +10,19 @@ server_type: "cax11"  # Small arm instance (2 vCPUs, 4GB RAM)
 server_image: "debian-12"
 server_location: "fsn1"  # Falkenstein
 
-# SSH configuration
-# Set these values via environment variables:
-# export SSH_KEY_NAME='your-key-name'
-# export SSH_PUBLIC_KEY='ssh-rsa AAAA...'
-ssh_key_name: "{{ lookup('env', 'SSH_KEY_NAME') | default('') }}"
-ssh_public_key: "{{ lookup('env', 'SSH_PUBLIC_KEY') | default('') }}"
+# CI SSH key configuration
+# Set via environment variable:
+# export CI_SSH_KEY_NAME='ci-key-name'
+# export CI_SSH_PUBLIC_KEY='ssh-rsa AAAA...CI'
+ci_ssh_key_name: "{{ lookup('env', 'CI_SSH_KEY_NAME') | default('') }}"
+ci_ssh_public_key: "{{ lookup('env', 'CI_SSH_PUBLIC_KEY') | default('') }}"
+
+# Admin SSH key configuration
+# Set via environment variable:
+# export ADMIN_SSH_KEY_NAME='admin-key-name'
+# export ADMIN_SSH_PUBLIC_KEY='ssh-rsa AAAA...ADMIN'
+admin_ssh_key_name: "{{ lookup('env', 'ADMIN_SSH_KEY_NAME') | default('') }}"
+admin_ssh_public_key: "{{ lookup('env', 'ADMIN_SSH_PUBLIC_KEY') | default('') }}"
 
 # Network configuration
 ensure_ipv4: true

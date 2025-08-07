@@ -1,0 +1,6 @@
+ansible>=8.0.0
+hcloud>=1.20.0
+jmespath>=1.0.0
+google-auth>=2.6.0
+google-api-python-client>=2.40.0
+requests>=2.27.1
