@@ -11,6 +11,7 @@
     - /opt/nginx-proxy/html
     - /opt/nginx-proxy/certs
     - /opt/nginx-proxy/gcloud-dns
+    - /opt/takuto-website/uploads
 
 - name: Create Google Cloud DNS service account key file
   copy:
@@ -39,6 +40,8 @@
     image_name_mismatch: "recreate"
     networks:
       - name: nginx-proxy
+    volumes:
+      - /opt/takuto-website/uploads/tmp:/usr/share/nginx/html/uploads:ro
     env:
       VIRTUAL_HOST: "{{ domains | join(',') }}"
       VIRTUAL_PORT: "80"
