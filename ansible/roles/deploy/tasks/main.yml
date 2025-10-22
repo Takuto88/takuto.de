@@ -41,7 +41,7 @@
     networks:
       - name: nginx-proxy
     volumes:
-      - /opt/takuto-website/uploads/tmp:/usr/share/nginx/html/uploads:ro
+      - /opt/takuto-website/uploads:/usr/share/nginx/html/uploads:ro
     env:
       VIRTUAL_HOST: "{{ domains | join(',') }}"
       VIRTUAL_PORT: "80"
