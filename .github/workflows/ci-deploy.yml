@@ -8,6 +8,11 @@ on:
       - 'src/**'
       - 'Dockerfile'
   workflow_dispatch:
+    inputs:
+      force_recreate:
+        description: 'Recreate the VM from scratch'
+        type: boolean
+        default: false
   schedule:
     - cron: '0 3 * * 1'
 
@@ -117,5 +122,6 @@ jobs:
           ADMIN_SSH_PUBLIC_KEY: ${{ vars.ADMIN_SSH_PUBLIC_KEY }}
           WEBSITE_VERSION: ${{ needs.build-and-push.outputs.image_tag }}
           GCLOUD_DNS_ZONE: 'takuto-de'
+          FORCE_RECREATE: "${{ inputs.force_recreate }}"
         run: |
-          ansible-playbook site.yml
+          ansible-playbook site.yml -e "force_recreate=${{ env.FORCE_RECREATE }}"

@@ -33,7 +33,7 @@
     ssh_keys:
       - "{{ ci_ssh_key_name }}"
       - "{{ admin_ssh_key_name }}"
-    state: present
+    state: "{{ 'rebuild' if force_recreate | default(false) | bool else 'present' }}"
   register: hcloud_server
   delegate_to: localhost
 
