@@ -37,6 +37,17 @@
     force_source: yes
     state: present
 
+- name: Create environment file for Docker Compose
+  copy:
+    content: |
+      EMAIL_FOR_CERTBOT={{ email_for_certbot }}
+      DOMAINS_STR={{ domains | join(',') }}
+      GCLOUD_DNS_PROJECT_ID={{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}
+      GCLOUD_DNS_ZONE_NAME={{ gcloud_dns_zone }}
+      WEBSITE_VERSION={{ website_version }}
+    dest: /opt/takuto-website/.env
+    mode: '0600'
+
 - name: Run website with Docker Compose
   community.docker.docker_compose_v2:
     project_src: /opt/takuto-website
@@ -44,8 +55,5 @@
       - docker-compose.yml
       - docker-compose.prod.yml
     state: present
-    env:
-      EMAIL_FOR_CERTBOT: "{{ email_for_certbot }}"
-      DOMAINS_STR: "{{ domains | join(',') }}"
-      GCLOUD_DNS_PROJECT_ID: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
-      GCLOUD_DNS_ZONE_NAME: "{{ gcloud_dns_zone }}"
+    env_files:
+      - .env
