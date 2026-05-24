@@ -24,7 +24,7 @@ services:
       - /opt/nginx-proxy/certs:/etc/nginx/certs:ro
 
   acme-companion:
-    image: nginxproxy/acme-companion:1.10.2
+    image: nginxproxy/acme-companion:2.6.3
     container_name: letsencrypt-companion
     restart: always
     networks:
