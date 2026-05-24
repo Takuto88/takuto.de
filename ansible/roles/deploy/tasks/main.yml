@@ -20,11 +20,15 @@
     dest: /opt/nginx-proxy/gcloud-dns/credentials.json
     mode: '0600'
 
-- name: Copy docker-compose.yml to deployment directory
+- name: Copy docker-compose files to deployment directory
   copy:
-    src: "../../docker-compose.yml"
-    dest: /opt/takuto-website/docker-compose.yml
+    src: "{{ playbook_dir }}/../{{ item }}"
+    dest: /opt/takuto-website/
     mode: '0644'
+  loop:
+    - "docker-compose.yml"
+    - "docker-compose.prod.yml"
+
 
 - name: Pull Docker image for the website
   community.docker.docker_image:
