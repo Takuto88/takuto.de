@@ -13,6 +13,10 @@ on:
         description: 'Recreate the VM from scratch'
         type: boolean
         default: false
+      push_image:
+        description: 'Push image to registry?'
+        type: boolean
+        default: true
   schedule:
     - cron: '0 3 * * 1'
 
@@ -36,6 +40,19 @@ jobs:
         id: git_rev
         run: echo "rev=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Determine push strategy
+        id: strategy
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_push=${{ github.event.inputs.push_image }}" >> $GITHUB_OUTPUT
+          else
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              echo "should_push=true" >> $GITHUB_OUTPUT
+            else
+              echo "should_push=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
       - name: Set image tag
         id: tags
         run: |
@@ -54,7 +71,7 @@ jobs:
           platforms: arm64
 
       - name: Log in to GitHub Container Registry
-        if: github.ref == 'refs/heads/main'
+        if: steps.strategy.outputs.should_push == 'true'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -66,7 +83,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          push: true
+          push: ${{ steps.strategy.outputs.should_push }}
           platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/takuto88/takuto-de:latest
@@ -77,7 +94,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          push: false
+          push: ${{ steps.strategy.outputs.should_push }}
           load: false
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/takuto88/takuto-de:${{ steps.tags.outputs.tag }}

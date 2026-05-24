@@ -40,8 +40,10 @@
 - name: Run website with Docker Compose
   community.docker.docker_compose_v2:
     project_src: /opt/takuto-website
+    files:
+      - docker-compose.yml
+      - docker-compose.prod.yml
     state: present
-    extra_args: "-f docker-compose.yml -f docker-compose.prod.yml"
   vars:
     EMAIL_FOR_CERTBOT: "{{ email_for_certbot }}"
     DOMAINS_STR: "{{ domains | join(',') }}"
