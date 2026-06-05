@@ -10,15 +10,8 @@
     - /opt/nginx-proxy/vhost.d
     - /opt/nginx-proxy/html
     - /opt/nginx-proxy/certs
-    - /opt/nginx-proxy/gcloud-dns
     - /opt/takuto-website
     - /opt/takuto-website/uploads
-
-- name: Create Google Cloud DNS service account key file
-  copy:
-    content: "{{ gcloud_dns_service_account }}"
-    dest: /opt/nginx-proxy/gcloud-dns/credentials.json
-    mode: '0600'
 
 - name: Copy docker-compose files to deployment directory
   copy:
@@ -42,8 +35,6 @@
     content: |
       EMAIL_FOR_CERTBOT={{ email_for_certbot }}
       DOMAINS_STR={{ domains | join(',') }}
-      GCLOUD_DNS_PROJECT_ID={{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}
-      GCLOUD_DNS_ZONE_NAME={{ gcloud_dns_zone }}
       WEBSITE_VERSION={{ website_version }}
     dest: /opt/takuto-website/.env
     mode: '0600'
