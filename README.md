@@ -6,22 +6,16 @@ Released under [MIT](LICENSE).
 
 ## Local development (Docker Compose)
 
- You need a recent version of Docker and Docker Compose installed.
+You need a recent version of Docker and Docker Compose installed.
 
 To start the development environment:
 
-1. Run Docker Compose:
-   ```shell
-   docker compose up
-   ```
-2. Open [http://localhost:8080](http://localhost:8080) in your browser.
+```shell
+docker compose -f docker-compose.yml -f docker-compose.local.yml up --build
+```
 
-## Production build & run (Docker Compose)
+Open [http://localhost:8080](http://localhost:8080) in your browser.
 
-To build and run the production image locally:
+## Production
 
-1. Build and start the container:
-   ```shell
-   docker compose -f docker-compose.yml up --build
-   ```
-2. Open [http://localhost](http://localhost) in your browser.
+The production setup uses `docker-compose.prod.yml` which includes nginx-proxy and acme-companion services. This is deployed via Ansible and not intended for local use.
