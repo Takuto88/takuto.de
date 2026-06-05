@@ -4,3 +4,5 @@ services:
     image: ghcr.io/takuto88/takuto-de:latest
     ports:
       - "80:80"
+    volumes:
+      - ./src:/usr/share/nginx/html
