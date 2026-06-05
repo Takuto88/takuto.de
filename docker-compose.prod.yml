@@ -42,11 +42,6 @@ services:
       DEFAULT_EMAIL: "${EMAIL_FOR_CERTBOT}"
       ACME_CA_URI: "https://acme-v02.api.letsencrypt.org/directory"
       NGINX_PROXY_CONTAINER: nginx-proxy
-      ACME_CHALLENGE_TYPE: "dns-01"
-      ACME_DNS_API: "gcloud"
-      GCE_PROJECT: "${GCLOUD_DNS_PROJECT_ID}"
-      GCE_SERVICE_ACCOUNT_FILE: "/gcloud-dns/credentials.json"
-      GCE_ZONE_NAME: "${GCLOUD_DNS_ZONE_NAME}"
 
 networks:
   nginx-proxy:
