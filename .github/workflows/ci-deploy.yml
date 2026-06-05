@@ -120,7 +120,7 @@ jobs:
           CI_SSH_PUBLIC_KEY: ${{ vars.CI_SSH_PUBLIC_KEY }}
           ADMIN_SSH_KEY_NAME: ${{ vars.ADMIN_SSH_KEY_NAME }}
           ADMIN_SSH_PUBLIC_KEY: ${{ vars.ADMIN_SSH_PUBLIC_KEY }}
-          WEBSITE_VERSION: ${{ needs.build-and-push.outputs.image_tag }}
+          WEBSITE_VERSION: ${{ github.ref == 'refs/heads/main' && needs.build-and-push.outputs.image_tag || 'latest' }}
           GCLOUD_DNS_ZONE: 'takuto-de'
           FORCE_RECREATE: "${{ inputs.force_recreate }}"
         run: |
