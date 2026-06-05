@@ -39,7 +39,7 @@ services:
       - /opt/nginx-proxy/html:/usr/share/nginx/html
     environment:
       DEFAULT_EMAIL: "${EMAIL_FOR_CERTBOT}"
-      ACME_CA_URI: "https://acme-v02.api.letsencrypt.org/directory"
+      ACME_CA_URI: "https://acme-staging-v02.api.letsencrypt.org/directory"
       NGINX_PROXY_CONTAINER: nginx-proxy
 
 networks:
