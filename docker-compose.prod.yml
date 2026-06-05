@@ -23,7 +23,7 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - /opt/nginx-proxy/conf.d:/etc/nginx/conf.d
       - /opt/nginx-proxy/vhost.d:/etc/nginx/vhost.d
-      - /opt/nginx-proxy/html:/etc/nginx/html
+      - /opt/nginx-proxy/html:/usr/share/nginx/html
       - /opt/nginx-proxy/certs:/etc/nginx/certs:ro
 
   acme-companion:
@@ -36,7 +36,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /opt/nginx-proxy/certs:/etc/nginx/certs
       - /opt/nginx-proxy/vhost.d:/etc/nginx/vhost.d
-      - /opt/nginx-proxy/html:/etc/nginx/html
+      - /opt/nginx-proxy/html:/usr/share/nginx/html
     environment:
       DEFAULT_EMAIL: "${EMAIL_FOR_CERTBOT}"
       ACME_CA_URI: "https://acme-v02.api.letsencrypt.org/directory"
