@@ -1,4 +1,5 @@
 ---
 collections:
-  - hetzner.hcloud
+  - name: hetzner.hcloud
+    version: ">=6.0.0"
   - google.cloud
