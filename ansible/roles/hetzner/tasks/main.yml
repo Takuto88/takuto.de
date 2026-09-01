@@ -123,27 +123,33 @@
     state: absent
   delegate_to: localhost
 
-- name: Wait for DNS A record propagation (using Google DNS 8.8.8.8)
+- name: Set expected DNS records
+  set_fact:
+    expected_dns_records: >-
+      {{ [hcloud_server.hcloud_server.ipv4_address]
+         + ([server_info.hcloud_server_info[0].ipv6 | regex_replace('/64$', '1')]
+            if server_info.hcloud_server_info[0].ipv6 is defined else []) }}
+
+- name: Wait for DNS record propagation (using Google DNS 8.8.8.8)
   shell: >
-    dig @8.8.8.8 takuto.de. A +short +tries=1
+    dig @8.8.8.8 takuto.de. A AAAA +short +tries=1
   register: dns_check
-  until: dns_check.stdout | trim == hcloud_server.hcloud_server.ipv4_address
+  until: (expected_dns_records | reject('in', dns_check.stdout_lines | default([]) | map('trim') | list) | list) | length == 0
   retries: 60
   delay: 5
   delegate_to: localhost
-  no_log: false
   failed_when: false
 
-- name: Display current DNS value
+- name: Display current DNS values
   debug:
     msg: |
-      Expected IP: {{ hcloud_server.hcloud_server.ipv4_address }}
-      Current DNS resolution: {{ dns_check.stdout | trim | default('no response') }}
-  when: dns_check.stdout | trim != hcloud_server.hcloud_server.ipv4_address
+      Expected records: {{ expected_dns_records | join(', ') }}
+      Current DNS resolution: {{ dns_check.stdout_lines | default([]) | map('trim') | list | join(', ') }}
+  when: (expected_dns_records | reject('in', dns_check.stdout_lines | default([]) | map('trim') | list) | list) | length > 0
   delegate_to: localhost
 
 - name: Check if DNS propagation completed in time
   fail:
-    msg: "DNS A record propagation did not complete within the timeout period (5 minutes). Expected {{ hcloud_server.hcloud_server.ipv4_address }} but got {{ dns_check.stdout | trim | default('no response') }}."
-  when: dns_check.stdout | trim != hcloud_server.hcloud_server.ipv4_address
+    msg: "DNS propagation did not complete within the timeout period (5 minutes). Expected {{ expected_dns_records | join(', ') }} but got {{ dns_check.stdout_lines | default([]) | map('trim') | list | join(', ') }}."
+  when: (expected_dns_records | reject('in', dns_check.stdout_lines | default([]) | map('trim') | list) | list) | length > 0
   delegate_to: localhost
