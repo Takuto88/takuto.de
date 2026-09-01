@@ -119,8 +119,8 @@
     - name: Get Google Cloud DNS managed zone
       google.cloud.gcp_dns_managed_zone:
         name: "{{ gcloud_dns_zone }}"
-        dns_name: "takuto.de."
-        description: "Managed zone for takuto.de"
+        dns_name: "{{ gcloud_dns_domain }}."
+        description: "Managed zone for {{ gcloud_dns_domain }}"
         project: "{{ gcp_project_id }}"
         auth_kind: "serviceaccount"
         service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
@@ -130,7 +130,7 @@
 
     - name: Update DNS A record for domain in Google Cloud DNS
       google.cloud.gcp_dns_resource_record_set:
-        name: "takuto.de."
+        name: "{{ gcloud_dns_domain }}."
         type: 'A'
         ttl: 300
         target:
@@ -144,7 +144,7 @@
 
     - name: Update DNS AAAA record for domain in Google Cloud DNS
       google.cloud.gcp_dns_resource_record_set:
-        name: "takuto.de."
+        name: "{{ gcloud_dns_domain }}."
         type: 'AAAA'
         ttl: 300
         target:
@@ -156,6 +156,20 @@
         state: present
       delegate_to: localhost
       when: server_info.hcloud_server_info[0].ipv6 is defined
+
+    - name: Update DNS CNAME record for www subdomain in Google Cloud DNS
+      google.cloud.gcp_dns_resource_record_set:
+        name: "www.{{ gcloud_dns_domain }}."
+        type: 'CNAME'
+        ttl: 300
+        target:
+          - "{{ gcloud_dns_domain }}."
+        managed_zone: "{{ managed_zone }}"
+        project: "{{ gcp_project_id }}"
+        auth_kind: "serviceaccount"
+        service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
+        state: present
+      delegate_to: localhost
   always:
     - name: Remove temporary GCP credentials
       file:
