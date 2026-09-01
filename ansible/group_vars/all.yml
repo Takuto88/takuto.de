@@ -10,6 +10,12 @@ server_type: "cax11"  # Small arm instance (2 vCPUs, 4GB RAM)
 server_image: "debian-12"
 server_location: "fsn1"  # Falkenstein
 
+# Firewall configuration
+firewall_name: "takuto-web"
+# Optional: restrict SSH access to these CIDRs. Empty means SSH is allowed
+# from anywhere (0.0.0.0/0 and ::/0).
+firewall_ssh_cidrs: []
+
 # CI SSH key configuration
 # Set via environment variable:
 # export CI_SSH_KEY_NAME='ci-key-name'
