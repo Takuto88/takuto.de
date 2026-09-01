@@ -52,7 +52,6 @@
     groups: web
     ansible_host: "{{ hcloud_server.hcloud_server.ipv4_address }}"
     ansible_user: root
-    hcloud_server_name: "{{ server_name }}"
   delegate_to: localhost
 
 - name: Create temporary directory for GCP credentials
