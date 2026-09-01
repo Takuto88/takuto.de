@@ -41,6 +41,9 @@ domains:
   - "www.takuto.de"
 email_for_certbot: "hello@takuto.de"  # Email address for Let's Encrypt notifications
 
+# Fail the deploy when the certificate expires within this many days
+cert_min_days_remaining: 14
+
 # Google Cloud DNS configuration for Let's Encrypt DNS challenge
 # Set these values via environment variables:
 # export GCLOUD_DNS_SA='{"type":"service_account",...}'

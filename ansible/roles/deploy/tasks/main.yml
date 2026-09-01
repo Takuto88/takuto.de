@@ -65,3 +65,65 @@
   until: health_check.rc == 0
   delegate_to: localhost
   become: no
+
+- name: Install acme-companion renewal service
+  copy:
+    content: |
+      [Unit]
+      Description=Restart acme-companion so it checks for certificate renewal
+      Requires=docker.service
+      After=docker.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/bin/docker restart letsencrypt-companion
+    dest: /etc/systemd/system/acme-companion-renew.service
+    mode: '0644'
+  register: renewal_service
+
+- name: Install acme-companion renewal timer
+  copy:
+    content: |
+      [Unit]
+      Description=Restart acme-companion daily to allow certificate renewal
+
+      [Timer]
+      OnCalendar=daily
+      Persistent=true
+      RandomizedDelaySec=3600
+
+      [Install]
+      WantedBy=timers.target
+    dest: /etc/systemd/system/acme-companion-renew.timer
+    mode: '0644'
+  register: renewal_timer
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  when: renewal_service.changed or renewal_timer.changed
+
+- name: Enable and start acme-companion renewal timer
+  systemd:
+    name: acme-companion-renew.timer
+    enabled: yes
+    state: started
+
+- name: Check that the certificate is not close to expiry
+  stat:
+    path: "/opt/nginx-proxy/certs/{{ domains[0] }}.crt"
+  register: cert_file
+
+- name: Check certificate expiry
+  command: >
+    openssl x509 -noout -checkend {{ cert_min_days_remaining * 86400 }}
+    -in "/opt/nginx-proxy/certs/{{ domains[0] }}.crt"
+  register: cert_expiry
+  changed_when: false
+  failed_when: false
+  when: cert_file.stat.exists
+
+- name: Fail when the certificate expires within {{ cert_min_days_remaining }} days
+  fail:
+    msg: "Certificate for {{ domains[0] }} expires within {{ cert_min_days_remaining }} days. The acme-companion should have renewed it - check the letsencrypt-companion container logs."
+  when: cert_file.stat.exists and cert_expiry.rc == 1
