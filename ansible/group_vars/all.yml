@@ -47,3 +47,5 @@ email_for_certbot: "hello@takuto.de"  # Email address for Let's Encrypt notifica
 # export GCLOUD_DNS_ZONE='your-zone-name'
 gcloud_dns_service_account: "{{ lookup('env', 'GCLOUD_DNS_SA') | default('') }}"
 gcloud_dns_zone: "{{ lookup('env', 'GCLOUD_DNS_ZONE') | default('takuto-de') }}"
+# Domain of the managed zone (FQDN without trailing dot)
+gcloud_dns_domain: "takuto.de"
