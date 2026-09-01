@@ -48,3 +48,7 @@
     state: present
     env_files:
       - .env
+
+- name: Prune unused Docker images
+  community.docker.docker_prune:
+    images: yes
