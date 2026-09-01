@@ -94,73 +94,75 @@
     gcp_project_id: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
   delegate_to: localhost
 
-- name: Create temporary directory for GCP credentials
-  tempfile:
-    state: directory
-    prefix: gcp_creds_
-  register: gcp_creds_dir
-  delegate_to: localhost
+- block:
+    - name: Create temporary directory for GCP credentials
+      tempfile:
+        state: directory
+        prefix: gcp_creds_
+      register: gcp_creds_dir
+      delegate_to: localhost
 
-- name: Write GCP service account credentials to file
-  copy:
-    content: "{{ gcloud_dns_service_account }}"
-    dest: "{{ gcp_creds_dir.path }}/credentials.json"
-    mode: '0600'
-  delegate_to: localhost
+    - name: Write GCP service account credentials to file
+      copy:
+        content: "{{ gcloud_dns_service_account }}"
+        dest: "{{ gcp_creds_dir.path }}/credentials.json"
+        mode: '0600'
+      delegate_to: localhost
 
-- name: Get server IPv6 address
-  hcloud_server_info:
-    api_token: "{{ hcloud_token }}"
-    name: "{{ server_name }}"
-  register: server_info
-  delegate_to: localhost
+    - name: Get server IPv6 address
+      hcloud_server_info:
+        api_token: "{{ hcloud_token }}"
+        name: "{{ server_name }}"
+      register: server_info
+      delegate_to: localhost
 
-- name: Get Google Cloud DNS managed zone
-  google.cloud.gcp_dns_managed_zone:
-    name: "{{ gcloud_dns_zone }}"
-    dns_name: "takuto.de."
-    description: "Managed zone for takuto.de"
-    project: "{{ gcp_project_id }}"
-    auth_kind: "serviceaccount"
-    service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
-    state: present
-  register: managed_zone
-  delegate_to: localhost
+    - name: Get Google Cloud DNS managed zone
+      google.cloud.gcp_dns_managed_zone:
+        name: "{{ gcloud_dns_zone }}"
+        dns_name: "takuto.de."
+        description: "Managed zone for takuto.de"
+        project: "{{ gcp_project_id }}"
+        auth_kind: "serviceaccount"
+        service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
+        state: present
+      register: managed_zone
+      delegate_to: localhost
 
-- name: Update DNS A record for domain in Google Cloud DNS
-  google.cloud.gcp_dns_resource_record_set:
-    name: "takuto.de."
-    type: 'A'
-    ttl: 300
-    target:
-      - "{{ hcloud_server.hcloud_server.ipv4_address }}"
-    managed_zone: "{{ managed_zone }}"
-    project: "{{ gcp_project_id }}"
-    auth_kind: "serviceaccount"
-    service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
-    state: present
-  delegate_to: localhost
+    - name: Update DNS A record for domain in Google Cloud DNS
+      google.cloud.gcp_dns_resource_record_set:
+        name: "takuto.de."
+        type: 'A'
+        ttl: 300
+        target:
+          - "{{ hcloud_server.hcloud_server.ipv4_address }}"
+        managed_zone: "{{ managed_zone }}"
+        project: "{{ gcp_project_id }}"
+        auth_kind: "serviceaccount"
+        service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
+        state: present
+      delegate_to: localhost
 
-- name: Update DNS AAAA record for domain in Google Cloud DNS
-  google.cloud.gcp_dns_resource_record_set:
-    name: "takuto.de."
-    type: 'AAAA'
-    ttl: 300
-    target:
-      - "{{ server_info.hcloud_server_info[0].ipv6 | regex_replace('/64$', '1') }}"
-    managed_zone: "{{ managed_zone }}"
-    project: "{{ gcp_project_id }}"
-    auth_kind: "serviceaccount"
-    service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
-    state: present
-  delegate_to: localhost
-  when: server_info.hcloud_server_info[0].ipv6 is defined
-
-- name: Remove temporary GCP credentials
-  file:
-    path: "{{ gcp_creds_dir.path }}"
-    state: absent
-  delegate_to: localhost
+    - name: Update DNS AAAA record for domain in Google Cloud DNS
+      google.cloud.gcp_dns_resource_record_set:
+        name: "takuto.de."
+        type: 'AAAA'
+        ttl: 300
+        target:
+          - "{{ server_info.hcloud_server_info[0].ipv6 | regex_replace('/64$', '1') }}"
+        managed_zone: "{{ managed_zone }}"
+        project: "{{ gcp_project_id }}"
+        auth_kind: "serviceaccount"
+        service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
+        state: present
+      delegate_to: localhost
+      when: server_info.hcloud_server_info[0].ipv6 is defined
+  always:
+    - name: Remove temporary GCP credentials
+      file:
+        path: "{{ gcp_creds_dir.path }}"
+        state: absent
+      delegate_to: localhost
+      when: gcp_creds_dir is defined and gcp_creds_dir.path is defined
 
 - name: Set expected DNS records
   set_fact:
