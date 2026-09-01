@@ -186,8 +186,9 @@
             if server_info.hcloud_server_info[0].ipv6 is defined else []) }}
 
 - name: Wait for DNS record propagation (using Google DNS 8.8.8.8)
-  shell: >
-    dig @8.8.8.8 takuto.de. A AAAA +short +tries=1
+  shell: |
+    dig @8.8.8.8 {{ gcloud_dns_domain }}. A +short +tries=1
+    dig @8.8.8.8 {{ gcloud_dns_domain }}. AAAA +short +tries=1
   register: dns_check
   until: (expected_dns_records | reject('in', dns_check.stdout_lines | default([]) | map('trim') | list) | list) | length == 0
   retries: 60
