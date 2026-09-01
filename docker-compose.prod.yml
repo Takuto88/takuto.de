@@ -1,6 +1,7 @@
 services:
   web:
     image: ghcr.io/takuto88/takuto-de:${WEBSITE_VERSION}
+    restart: unless-stopped
     volumes:
       - /opt/takuto-website/uploads:/usr/share/nginx/html/uploads:ro
     networks:
