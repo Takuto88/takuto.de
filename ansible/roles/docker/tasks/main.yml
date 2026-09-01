@@ -7,21 +7,16 @@
 - name: Install required packages
   apt:
     name:
-      - apt-transport-https
       - ca-certificates
-      - curl
-      - gnupg
       - python3-pip
     state: present
 
-- name: Add Docker GPG apt key
-  apt_key:
-    url: https://download.docker.com/linux/debian/gpg
-    state: present
-
 - name: Add Docker repository
-  apt_repository:
-    repo: "deb [arch={{ 'arm64' if ansible_architecture == 'aarch64' else ansible_architecture }}] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+  deb822_repository:
+    name: docker
+    repos: "deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    architectures: "{{ 'arm64' if ansible_architecture == 'aarch64' else ansible_architecture }}"
+    signed_by: https://download.docker.com/linux/debian/gpg
     state: present
 
 - name: Install Docker CE
