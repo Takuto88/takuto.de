@@ -8,7 +8,6 @@
   apt:
     name:
       - ca-certificates
-      - python3-pip
     state: present
 
 - name: Add Docker repository
