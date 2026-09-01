@@ -23,6 +23,33 @@
   register: hcloud_admin_ssh_key
   delegate_to: localhost
 
+- name: Ensure Hetzner Cloud firewall
+  hetzner.hcloud.firewall:
+    api_token: "{{ hcloud_token }}"
+    name: "{{ firewall_name }}"
+    rules:
+      - description: "Allow SSH"
+        direction: in
+        protocol: tcp
+        port: "22"
+        source_ips: "{{ firewall_ssh_cidrs if firewall_ssh_cidrs | default([]) else ['0.0.0.0/0', '::/0'] }}"
+      - description: "Allow HTTP"
+        direction: in
+        protocol: tcp
+        port: "80"
+        source_ips:
+          - "0.0.0.0/0"
+          - "::/0"
+      - description: "Allow HTTPS"
+        direction: in
+        protocol: tcp
+        port: "443"
+        source_ips:
+          - "0.0.0.0/0"
+          - "::/0"
+    state: present
+  delegate_to: localhost
+
 - name: Create Hetzner Cloud server
   hcloud_server:
     api_token: "{{ hcloud_token }}"
@@ -30,6 +57,8 @@
     server_type: "{{ server_type }}"
     image: "{{ server_image }}"
     location: "{{ server_location }}"
+    firewalls:
+      - "{{ firewall_name }}"
     ssh_keys:
       - "{{ ci_ssh_key_name }}"
       - "{{ admin_ssh_key_name }}"
