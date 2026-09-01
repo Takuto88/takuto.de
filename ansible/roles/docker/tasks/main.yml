@@ -8,14 +8,17 @@
   apt:
     name:
       - ca-certificates
+      - python3-debian
     state: present
 
 - name: Add Docker repository
   deb822_repository:
     name: docker
-    repos: "deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    uris: "https://download.docker.com/linux/debian"
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
     architectures: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
-    signed_by: https://download.docker.com/linux/debian/gpg
+    signed_by: "https://download.docker.com/linux/debian/gpg"
     state: present
 
 - name: Install Docker CE
