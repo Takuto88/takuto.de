@@ -81,6 +81,7 @@
     groups: web
     ansible_host: "{{ hcloud_server.hcloud_server.ipv4_address }}"
     ansible_user: root
+    ansible_python_interpreter: /usr/bin/python3
   delegate_to: localhost
 
 - name: Fail early when GCP credentials are missing
