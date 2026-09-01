@@ -52,3 +52,16 @@
 - name: Prune unused Docker images
   community.docker.docker_prune:
     images: yes
+
+- name: Check HTTPS health of the deployed site
+  shell: >
+    curl -fsS --max-time 10 "https://{{ domains[0] }}/"
+  args:
+    executable: /bin/bash
+  register: health_check
+  changed_when: false
+  retries: 12
+  delay: 15
+  until: health_check.rc == 0
+  delegate_to: localhost
+  become: no
