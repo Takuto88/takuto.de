@@ -55,6 +55,17 @@
     hcloud_server_name: "{{ server_name }}"
   delegate_to: localhost
 
+- name: Fail early when GCP credentials are missing
+  fail:
+    msg: "GCLOUD_DNS_SA is not set or empty. Export the GCP service account JSON before running the playbook."
+  when: gcloud_dns_service_account is string and gcloud_dns_service_account | trim | length == 0
+  delegate_to: localhost
+
+- name: Resolve GCP project ID
+  set_fact:
+    gcp_project_id: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
+  delegate_to: localhost
+
 - name: Create temporary directory for GCP credentials
   tempfile:
     state: directory
@@ -81,7 +92,7 @@
     name: "{{ gcloud_dns_zone }}"
     dns_name: "takuto.de."
     description: "Managed zone for takuto.de"
-    project: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
+    project: "{{ gcp_project_id }}"
     auth_kind: "serviceaccount"
     service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
     state: present
@@ -96,7 +107,7 @@
     target:
       - "{{ hcloud_server.hcloud_server.ipv4_address }}"
     managed_zone: "{{ managed_zone }}"
-    project: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
+    project: "{{ gcp_project_id }}"
     auth_kind: "serviceaccount"
     service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
     state: present
@@ -110,7 +121,7 @@
     target:
       - "{{ server_info.hcloud_server_info[0].ipv6 | regex_replace('/64$', '1') }}"
     managed_zone: "{{ managed_zone }}"
-    project: "{{ (gcloud_dns_service_account.project_id) if (gcloud_dns_service_account is mapping) else (gcloud_dns_service_account | from_json | json_query('project_id')) }}"
+    project: "{{ gcp_project_id }}"
     auth_kind: "serviceaccount"
     service_account_file: "{{ gcp_creds_dir.path }}/credentials.json"
     state: present
