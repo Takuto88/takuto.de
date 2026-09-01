@@ -24,9 +24,6 @@ ci_ssh_public_key: "{{ lookup('env', 'CI_SSH_PUBLIC_KEY') | default('') }}"
 admin_ssh_key_name: "{{ lookup('env', 'ADMIN_SSH_KEY_NAME') | default('') }}"
 admin_ssh_public_key: "{{ lookup('env', 'ADMIN_SSH_PUBLIC_KEY') | default('') }}"
 
-# Network configuration
-ensure_ipv4: true
-
 # Deployment configuration
 # Set via environment variable:
 # export WEBSITE_VERSION='v1.0.0'
