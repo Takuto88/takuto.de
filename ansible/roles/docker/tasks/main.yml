@@ -15,7 +15,7 @@
   deb822_repository:
     name: docker
     repos: "deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
-    architectures: "{{ 'arm64' if ansible_architecture == 'aarch64' else ansible_architecture }}"
+    architectures: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
     signed_by: https://download.docker.com/linux/debian/gpg
     state: present
 
