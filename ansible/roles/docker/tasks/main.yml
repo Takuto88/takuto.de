@@ -19,14 +19,9 @@
     url: https://download.docker.com/linux/debian/gpg
     state: present
 
-- name: Determine architecture
-  command: dpkg --print-architecture
-  register: architecture
-  changed_when: false
-
 - name: Add Docker repository
   apt_repository:
-    repo: "deb [arch={{ architecture.stdout }}] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    repo: "deb [arch={{ 'arm64' if ansible_architecture == 'aarch64' else ansible_architecture }}] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
     state: present
 
 - name: Install Docker CE
