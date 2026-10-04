@@ -116,6 +116,8 @@ jobs:
         env:
           HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
           GCLOUD_DNS_SA: ${{ secrets.GCLOUD_DNS_SA }}
+          SCREEGO_USERNAME: ${{ secrets.SCREEGO_USERNAME }}
+          SCREEGO_PASSWORD: ${{ secrets.SCREEGO_PASSWORD }}
           CI_SSH_KEY_NAME: ${{ vars.CI_SSH_KEY_NAME }}
           CI_SSH_PUBLIC_KEY: ${{ vars.CI_SSH_PUBLIC_KEY }}
           ADMIN_SSH_KEY_NAME: ${{ vars.ADMIN_SSH_KEY_NAME }}
