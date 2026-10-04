@@ -41,6 +41,18 @@ domains:
   - "www.takuto.de"
 email_for_certbot: "hello@takuto.de"  # Email address for Let's Encrypt notifications
 
+# Screego screen sharing, served behind HTTP basic auth
+# Set via environment variable:
+# export SCREEGO_USERNAME='user'
+# export SCREEGO_PASSWORD='secret'
+screego_domain: "screen.takuto.de"
+screego_version: "1.12.6"
+screego_username: "{{ lookup('env', 'SCREEGO_USERNAME') | default('') }}"
+screego_password: "{{ lookup('env', 'SCREEGO_PASSWORD') | default('') }}"
+# UDP ports the built-in TURN server relays media over
+screego_turn_port_min: 50000
+screego_turn_port_max: 50200
+
 # Google Cloud DNS configuration for Let's Encrypt DNS challenge
 # Set these values via environment variables:
 # export GCLOUD_DNS_SA='{"type":"service_account",...}'
