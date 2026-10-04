@@ -16,6 +16,26 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  screego:
+    image: ghcr.io/screego/server:${SCREEGO_VERSION}
+    restart: unless-stopped
+    # Port 5050 is closed in the Hetzner firewall; only nginx-proxy reaches it
+    network_mode: host
+    environment:
+      - VIRTUAL_HOST=${SCREEGO_DOMAIN}
+      - VIRTUAL_PORT=5050
+      - LETSENCRYPT_HOST=${SCREEGO_DOMAIN}
+      - SCREEGO_EXTERNAL_IP=${SCREEGO_EXTERNAL_IP}
+      - SCREEGO_TURN_PORT_RANGE=${SCREEGO_TURN_PORT_RANGE}
+      - SCREEGO_TRUST_PROXY_HEADERS=true
+      # Access is guarded by basic auth in nginx-proxy
+      - SCREEGO_AUTH_MODE=none
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   nginx-proxy:
     image: nginxproxy/nginx-proxy:1.10.2
     container_name: nginx-proxy
@@ -31,6 +51,7 @@ services:
       - /opt/nginx-proxy/vhost.d:/etc/nginx/vhost.d
       - /opt/nginx-proxy/html:/usr/share/nginx/html
       - /opt/nginx-proxy/certs:/etc/nginx/certs:ro
+      - /opt/nginx-proxy/htpasswd:/etc/nginx/htpasswd:ro
     logging:
       driver: json-file
       options:

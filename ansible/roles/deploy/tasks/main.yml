@@ -1,4 +1,9 @@
 ---
+- name: Fail early when Screego credentials are missing
+  fail:
+    msg: "SCREEGO_USERNAME or SCREEGO_PASSWORD is not set or empty. Screego must not be served without basic auth."
+  when: screego_username | trim | length == 0 or screego_password | trim | length == 0
+
 - name: Create application directories
   file:
     path: "{{ item }}"
@@ -10,6 +15,7 @@
     - /opt/nginx-proxy/vhost.d
     - /opt/nginx-proxy/html
     - /opt/nginx-proxy/certs
+    - /opt/nginx-proxy/htpasswd
     - /opt/takuto-website
     - /opt/takuto-website/uploads
 
@@ -22,6 +28,38 @@
     - "docker-compose.yml"
     - "docker-compose.prod.yml"
 
+
+- name: Read existing Screego htpasswd file
+  slurp:
+    src: "/opt/nginx-proxy/htpasswd/{{ screego_domain }}"
+  register: screego_existing_htpasswd
+  failed_when: false
+  no_log: true
+
+# Reusing the existing salt keeps the file unchanged across deploys
+- name: Hash Screego basic auth password
+  command: >-
+    openssl passwd -6 -stdin
+    {{ ('-salt ' + screego_existing_salt) if screego_existing_salt else '' }}
+  args:
+    stdin: "{{ screego_password }}"
+  vars:
+    screego_existing_salt: >-
+      {{ (screego_existing_htpasswd.content | default('') | b64decode)
+         | regex_search('\$6\$([^$]+)\$', '\1') | default([''], true) | first }}
+  register: screego_password_hash
+  changed_when: false
+  no_log: true
+
+# Readable by the nginx user (uid/gid 101) inside the nginx-proxy container
+- name: Write Screego htpasswd file for nginx-proxy
+  copy:
+    content: "{{ screego_username }}:{{ screego_password_hash.stdout }}\n"
+    dest: "/opt/nginx-proxy/htpasswd/{{ screego_domain }}"
+    owner: root
+    group: "101"
+    mode: '0640'
+  no_log: true
 
 - name: Pull Docker image for the website
   community.docker.docker_image:
@@ -36,6 +74,10 @@
       EMAIL_FOR_CERTBOT={{ email_for_certbot }}
       DOMAINS_STR={{ domains | join(',') }}
       WEBSITE_VERSION={{ website_version }}
+      SCREEGO_VERSION={{ screego_version }}
+      SCREEGO_DOMAIN={{ screego_domain }}
+      SCREEGO_EXTERNAL_IP={{ ([ansible_facts['default_ipv4']['address']] + ([ansible_facts['default_ipv6']['address']] if ansible_facts['default_ipv6']['address'] is defined else [])) | join(',') }}
+      SCREEGO_TURN_PORT_RANGE={{ screego_turn_port_min }}:{{ screego_turn_port_max }}
     dest: /opt/takuto-website/.env
     mode: '0600'
 
@@ -63,5 +105,16 @@
   retries: 12
   delay: 15
   until: health_check.rc == 0
+  delegate_to: localhost
+  become: no
+
+- name: Check Screego is served over HTTPS and requires basic auth
+  uri:
+    url: "https://{{ screego_domain }}/"
+    status_code: 401
+  register: screego_health_check
+  retries: 12
+  delay: 15
+  until: screego_health_check.status == 401
   delegate_to: localhost
   become: no
