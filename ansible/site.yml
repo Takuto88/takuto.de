@@ -11,4 +11,5 @@
   become: yes
   roles:
     - docker
+    - unattended_upgrades
     - deploy

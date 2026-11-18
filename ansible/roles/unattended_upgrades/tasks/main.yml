@@ -1,0 +1,57 @@
+---
+- name: Install unattended-upgrades
+  apt:
+    name: unattended-upgrades
+    state: present
+
+# Same content the package postinst would write on a debconf "true" answer
+- name: Enable daily apt update runs and unattended upgrades
+  copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    mode: '0644'
+
+# Appends to the packaged Origins-Pattern in 50unattended-upgrades, which
+# already covers the Debian security origin; bookworm-backports has its own
+# origin and label, so it stays excluded
+- name: Install all Debian and Docker updates and reboot when required
+  copy:
+    dest: /etc/apt/apt.conf.d/51unattended-upgrades-local
+    content: |
+      Unattended-Upgrade::Origins-Pattern {
+              "origin=Debian,codename=${distro_codename},label=Debian";
+              "origin=Debian,codename=${distro_codename}-updates,label=Debian";
+              "origin=Docker,codename=${distro_codename},label=Docker CE";
+      };
+
+      Unattended-Upgrade::Automatic-Reboot "true";
+      Unattended-Upgrade::Automatic-Reboot-Time "04:00";
+    mode: '0644'
+
+- name: Run the upgrade at a fixed 03:00 instead of the random default
+  copy:
+    dest: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
+    content: |
+      [Timer]
+      OnCalendar=
+      OnCalendar=*-*-* 03:00
+      RandomizedDelaySec=0
+    mode: '0644'
+
+- name: Apply the timer override
+  systemd:
+    name: apt-daily-upgrade.timer
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+
+- name: Ensure the apt timers are enabled
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - apt-daily.timer
+    - apt-daily-upgrade.timer
