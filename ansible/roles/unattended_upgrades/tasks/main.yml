@@ -27,7 +27,7 @@
       };
 
       Unattended-Upgrade::Automatic-Reboot "true";
-      Unattended-Upgrade::Automatic-Reboot-Time "04:00";
+      Unattended-Upgrade::Automatic-Reboot-Time "now";
     mode: '0644'
 
 - name: Run the upgrade at a fixed 03:00 instead of the random default
