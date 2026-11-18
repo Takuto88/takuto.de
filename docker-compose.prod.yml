@@ -43,6 +43,11 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      # Temporary mitigation for CVE-2026-123633 / CVE-2026-123007
+      # (nginx-proxy 1.10.2 is based on vulnerable nginx 1.31.0);
+      # remove once nginx-proxy ships nginx >= 1.31.9 / 1.30.7
+      - ENABLE_HTTP2=false
     networks:
       - nginx-proxy
     volumes:
