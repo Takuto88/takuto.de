@@ -30,6 +30,12 @@
       Unattended-Upgrade::Automatic-Reboot-Time "now";
     mode: '0644'
 
+- name: Create timer override directory
+  file:
+    path: /etc/systemd/system/apt-daily-upgrade.timer.d
+    state: directory
+    mode: '0755'
+
 - name: Run the upgrade at a fixed 03:00 instead of the random default
   copy:
     dest: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
