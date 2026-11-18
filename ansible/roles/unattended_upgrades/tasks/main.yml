@@ -23,7 +23,7 @@
       Unattended-Upgrade::Origins-Pattern {
               "origin=Debian,codename=${distro_codename},label=Debian";
               "origin=Debian,codename=${distro_codename}-updates,label=Debian";
-              "origin=Docker,codename=${distro_codename},label=Docker CE";
+              "origin=Docker,archive=${distro_codename},label=Docker CE";
       };
 
       Unattended-Upgrade::Automatic-Reboot "true";
