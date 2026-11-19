@@ -1,0 +1,34 @@
+# syntax=docker/dockerfile:1
+
+# Upstream nginx-proxy 1.10.2 is built on nginx 1.31.0, which is vulnerable to
+# CVE-2026-123007 and CVE-2026-123633. Keep the upstream application (docker-gen,
+# forego, nginx.tmpl, entrypoint) but run it on a patched nginx.
+FROM nginxproxy/nginx-proxy:1.10.2-alpine AS upstream
+
+FROM nginx:1.31.9-alpine
+
+ARG PROXY_VERSION="dev"
+
+# Used by the entrypoint's version banner and by acme-companion
+ENV NGINX_PROXY_VERSION=${PROXY_VERSION} \
+    DOCKER_HOST=unix:///tmp/docker.sock
+
+# Mirrors upstream Dockerfile.alpine: raise worker_connections for the
+# CVE-2026-123633 connection-exhaustion path and add the toplevel include
+RUN apk add --no-cache --virtual .run-deps bash openssl \
+   && echo -e "\ninclude /etc/nginx/toplevel.conf.d/*.conf;" >> /etc/nginx/nginx.conf \
+   && sed -i 's/worker_connections.*;$/worker_connections   10240;/' /etc/nginx/nginx.conf \
+   && sed -i -e '/^\}$/{s//\}\nworker_rlimit_nofile 20480;/;:a' -e '$!N;$!ba' -e '}' /etc/nginx/nginx.conf \
+   && mkdir -p /etc/nginx/toplevel.conf.d /etc/nginx/dhparam /etc/nginx/certs /usr/share/nginx/html/errors
+
+# Both binaries are statically linked against musl
+COPY --from=upstream /usr/local/bin/docker-gen /usr/local/bin/docker-gen
+COPY --from=upstream /usr/local/bin/forego /usr/local/bin/forego
+
+COPY --from=upstream /app /app
+COPY --from=upstream /etc/nginx/network_internal.conf /etc/nginx/
+
+WORKDIR /app/
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["forego", "start", "-r"]

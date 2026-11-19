@@ -34,6 +34,8 @@ admin_ssh_public_key: "{{ lookup('env', 'ADMIN_SSH_PUBLIC_KEY') | default('') }}
 # Set via environment variable:
 # export WEBSITE_VERSION='v1.0.0'
 website_version: "{{ lookup('env', 'WEBSITE_VERSION') | default('latest') }}"  # Default version tag for the Docker image
+# Image built from Dockerfile.nginx-proxy (upstream nginx-proxy on patched nginx)
+nginx_proxy_version: "{{ lookup('env', 'NGINX_PROXY_VERSION') | default('latest') }}"
 
 # Nginx reverse proxy configuration
 domains:

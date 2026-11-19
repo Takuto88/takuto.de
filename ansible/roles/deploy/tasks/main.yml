@@ -61,12 +61,15 @@
     mode: '0640'
   no_log: true
 
-- name: Pull Docker image for the website
+- name: Pull Docker images
   community.docker.docker_image:
-    name: "ghcr.io/takuto88/takuto-de:{{ website_version }}"
+    name: "{{ item }}"
     source: pull
     force_source: yes
     state: present
+  loop:
+    - "ghcr.io/takuto88/takuto-de:{{ website_version }}"
+    - "ghcr.io/takuto88/takuto-de-nginx-proxy:{{ nginx_proxy_version }}"
 
 - name: Create environment file for Docker Compose
   copy:
@@ -74,6 +77,7 @@
       EMAIL_FOR_CERTBOT={{ email_for_certbot }}
       DOMAINS_STR={{ domains | join(',') }}
       WEBSITE_VERSION={{ website_version }}
+      NGINX_PROXY_VERSION={{ nginx_proxy_version }}
       SCREEGO_VERSION={{ screego_version }}
       SCREEGO_DOMAIN={{ screego_domain }}
       SCREEGO_EXTERNAL_IP={{ ([ansible_facts['default_ipv4']['address']] + ([ansible_facts['default_ipv6']['address']] if ansible_facts['default_ipv6']['address'] is defined else [])) | join(',') }}
