@@ -9,8 +9,11 @@ FROM nginx:1.31.9-alpine
 
 ARG PROXY_VERSION="dev"
 
-# Used by the entrypoint's version banner and by acme-companion
+# NGINX_PROXY_VERSION only feeds the entrypoint's version banner. DOCKER_GEN_VERSION
+# must be set because acme-companion finds the docker-gen container by its presence;
+# only the variable's existence is checked, not its value.
 ENV NGINX_PROXY_VERSION=${PROXY_VERSION} \
+    DOCKER_GEN_VERSION="unknown" \
     DOCKER_HOST=unix:///tmp/docker.sock
 
 # Mirrors upstream Dockerfile.alpine: raise worker_connections for the
