@@ -1,0 +1,20 @@
+---
+# A freshly provisioned Hetzner server has password authentication enabled by
+# default, which invites brute-force attempts. Access is key-only: the Hetzner
+# cloud-init keys and the CI key.
+- name: Disable SSH password authentication
+  copy:
+    dest: /etc/ssh/sshd_config.d/99-disable-password-auth.conf
+    content: |
+      # Password authentication allows brute-force attempts against this host;
+      # access is key-only (Hetzner cloud-init keys and the CI key).
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+    mode: '0644'
+  notify: Reload sshd
+
+# Handlers only run at the end of the play, so a broken config aborts the play
+# before it reaches the running sshd
+- name: Verify the merged sshd configuration
+  command: sshd -t
+  changed_when: false

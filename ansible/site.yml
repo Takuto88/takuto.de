@@ -10,6 +10,7 @@
   gather_facts: yes
   become: yes
   roles:
+    - ssh_hardening
     - docker
     - unattended_upgrades
     - deploy
