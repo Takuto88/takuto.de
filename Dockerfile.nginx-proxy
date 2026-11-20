@@ -3,7 +3,7 @@
 # Upstream nginx-proxy 1.10.2 is built on nginx 1.31.0, which is vulnerable to
 # CVE-2026-123007 and CVE-2026-123633. Keep the upstream application (docker-gen,
 # forego, nginx.tmpl, entrypoint) but run it on a patched nginx.
-FROM nginxproxy/nginx-proxy:1.10.2-alpine AS upstream
+FROM nginxproxy/nginx-proxy:1.11.6-alpine AS upstream
 
 FROM nginx:1.31.9-alpine
 
